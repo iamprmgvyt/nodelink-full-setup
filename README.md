@@ -1,258 +1,384 @@
-<p align="center">
-  <img src="https://github.com/1Lucas1apk/lab/blob/master/mwc2h6q%20-%20Imgur.png?raw=true" alt="NodeLink Banner"/>
-</p>
+# 🎵 NodeLink — Production-Ready `config.js`
 
-<h1 align="center">NodeLink</h1>
+> A clean, fully-commented `config.js` template for [NodeLink](https://github.com/PerformanC/NodeLink), stripped of all personal credentials and ready to deploy.
 
-<p align="center">
-  <b>A modern Lavalink alternative built entirely in Node.js</b><br>
-  Lightweight, modular, and optimized for real-time performance.
-</p>
-
-<p align="center">
-  <a href="https://nodelink.js.org">📚 Documentation</a> •
-  <a href="https://nodelink.js.org/docs/api/rest">API Reference</a> •
-  <a href="https://nodelink.js.org/docs/differences">NodeLink vs Lavalink</a> •
-  <a href="https://nodelink.js.org/docs/troubleshooting">Troubleshooting</a>
-</p>
+This configuration is optimized for **clustered playback**, **low-resource hosting**, and **panel-based environments** (Pterodactyl, HidenCloud, etc.). It ships with support for 40+ audio sources and all audio filters enabled.
 
 ---
 
-## Prerequisites
+## 📋 Table of Contents
 
-* **Node.js** v22.22.2 or higher (v24 recommended)
-* **Git**
-
----
-
-## Overview
-
-**NodeLink** is an alternative audio server built in **Node.js**, designed for those who value control and efficiency. 🌿
-It doesn’t try to reinvent the wheel — it just makes it spin with less weight.
-Easy to configure, naturally scalable, and with smooth playback, it provides a solid foundation for music bots and real-time audio systems.
-
-Created by Brazilian developers, NodeLink was born from the desire for a simpler, open, and truly accessible audio server for everyone.
-
-**Full documentation available at [nodelink.js.org](https://nodelink.js.org)** 💚
-
----
-
-## Features
-
-* **100% Node.js implementation** – No external runtime required
-* **Lavalink-compatible API** – Works with most existing clients
-* **Optimized decoding** ⚡ – Powered by WebAssembly and native modules
-* **Worker-based architecture** – Each player can run in its own process for true isolation
-* **Real-time audio filters** – Equalizer, timescale, tremolo, compressor, echo, chorus, phaser, and more
-* **Low memory footprint** – Efficient even with multiple active players
-* **Prometheus metrics** – Production-ready monitoring with detailed statistics
-* **Multiple source support** – 15+ sources including YouTube, Spotify, Apple Music, Deezer, and more
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Required Configuration](#-required-configuration)
+  - [1. Server Settings](#1-server-settings)
+  - [2. YouTube Refresh Token](#2-youtube-refresh-token)
+  - [3. Spotify Credentials](#3-spotify-credentials)
+- [Optional Sources](#-optional-sources)
+  - [Apple Music](#apple-music)
+  - [Tidal](#tidal)
+  - [Deezer](#deezer)
+  - [Qobuz](#qobuz)
+  - [Yandex Music](#yandex-music)
+  - [VK Music](#vk-music)
+  - [Bilibili](#bilibili)
+  - [Audius](#audius)
+  - [Last.fm](#lastfm)
+  - [SongLink / Odesli](#songlink--odesli)
+- [How to Run](#-how-to-run)
+  - [Option A — Standard VPS / Linux](#option-a--standard-vps--linux)
+  - [Option B — Pterodactyl / Web Panels](#option-b--pterodactyl--web-panels)
+- [Connecting Your Discord Bot](#-connecting-your-discord-bot)
+- [Cluster & Performance Tuning](#-cluster--performance-tuning)
 
 ---
 
-## Quick Start
+## 🛑 Prerequisites
+
+| Requirement | Version |
+|---|---|
+| **Node.js** | **22.x or higher** (strictly required) |
+| **npm** | Included with Node.js |
+
+> ⚠️ NodeLink will **not** start on Node.js versions below 22. Verify with `node -v` before proceeding.
+
+---
+
+## ⚡ Quick Start
 
 ```bash
-# Clone the repository
+# 1. Clone the official NodeLink repository
 git clone https://github.com/PerformanC/NodeLink.git
 cd NodeLink
 
-# Install dependencies
+# 2. Download this config.js and place it in the root folder
+#    (replace the existing config.js)
+
+# 3. Open config.js and fill in your credentials (see below)
+
+# 4. Install dependencies
 npm install
 
-# Copy the default configuration file
-cp config.default.js config.js
-
-# Start the server
+# 5. Start the server
 npm run start
 ```
 
-Once started, NodeLink runs a Lavalink-compatible WebSocket server, ready for immediate use.
+---
 
-### Docker
+## 🔑 Required Configuration
 
-NodeLink also supports Docker for easy deployment:
+Open `config.js` and replace the following placeholders before starting:
 
-```bash
-# Using Docker Compose
-docker-compose up -d
+### 1. Server Settings
 
-# Or using Docker directly
-docker build -t nodelink .
-docker run -p 2333:2333 nodelink
+Located at the **very top** of the file:
+
+```javascript
+server: {
+  host: '0.0.0.0',
+  port: yourporthere,        // ← Replace with your allocated port (e.g. 2333, 24656)
+  password: 'yourpassword',  // ← Replace with a strong password
+  useBunServer: false
+}
 ```
 
-**See the Docker guide:** [nodelink.js.org/docs/advanced/docker](https://nodelink.js.org/docs/advanced/docker)
+> **Panel users:** Use the port assigned to you in the Pterodactyl/HidenCloud panel. Do **not** use `2333` unless it is explicitly allocated to you.
 
 ---
 
-## Usage
+### 2. YouTube Refresh Token
 
-NodeLink is compatible with most Lavalink clients, as it implements nearly the entire original API.
-However, some clients may not work properly, since NodeLink changes certain behaviors and endpoints.
+Without this token, YouTube playback will frequently hit **rate limit errors (HTTP 429)**.
 
-| Client                                                              | Platform     | v3 supported? | NodeLink Features? | NodeLink major version | Notes                                                                                                                                                                                                           |
-| ------------------------------------------------------------------- | ------------ | ------------- | ------------------ | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Lavalink-Client](https://github.com/lavalink-devs/Lavalink-Client) | JVM          | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Lavalink.kt](https://github.com/DRSchlaubi/Lavalink.kt)            | Kotlin       | unknown       | No                 | v1                     |                                                                                                                                                                                                                 |
-| [DisGoLink](https://github.com/disgoorg/disgolink)                  | Go           | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Lavalink.py](https://github.com/devoxin/lavalink.py)               | Python       | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Mafic](https://github.com/ooliver1/mafic)                          | Python       | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Wavelink](https://github.com/PythonistaGuild/Wavelink)             | Python       | Yes           | No                 | v1, v2, v3             |                                                                                                                                                                                                                 |
-| [Pomice](https://github.com/cloudwithax/pomice)                     | Python       | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [lava-lyra](https://github.com/ParrotXray/lava-lyra)                | Python       | Yes           | Yes                | v3                     |                                                                                                                                                                                                                 |
-| [Hikari-ongaku](https://github.com/MPlatypus/hikari-ongaku)         | Python       | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Moonlink.js](https://github.com/1Lucas1apk/moonlink.js)            | TypeScript   | Yes           | Yes                | v1, v2, v3             |                                                                                                                                                                                                                 |
-| [Magmastream](https://github.com/Blackfort-Hosting/magmastream)     | TypeScript   | unknown       | No                 | v1                     |                                                                                                                                                                                                                 |
-| [Lavacord](https://github.com/lavacord/Lavacord)                    | TypeScript   | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Shoukaku](https://github.com/Deivu/Shoukaku)                       | TypeScript   | Yes           | No                 | v1, v2, v3             |                                                                                                                                                                                                                 |
-| [Hoshimi](https://github.com/Ganyu-Studios/Hoshimi)                 | TypeScript   | Yes           | No                 | v1, v2, v3             | ;P                                                                                                                                                                                                              |
-| [Lavalink-Client](https://github.com/tomato6966/Lavalink-Client)    | TypeScript   | Yes           | Yes                | v1, v3                 |                                                                                                                                                                                                                 |
-| [Rainlink](https://github.com/RainyXeon/Rainlink)                   | TypeScript   | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Poru](https://github.com/parasop/Poru)                             | TypeScript   | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Blue.ts](https://github.com/ftrapture/blue.ts)                     | TypeScript   | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [FastLink](https://github.com/PerformanC/FastLink)                  | Node.js      | Yes           | No                 | v1, v2, v3             |                                                                                                                                                                                                                 |
-| [Riffy](https://github.com/riffy-team/riffy)                        | Node.js      | Yes           | No                 | v1, v2, v3             |                                                                                                                                                                                                                 |
-| [TsumiLink](https://github.com/Fyphen1223/TsumiLink)                | Node.js      | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [AquaLink](https://github.com/ToddyTheNoobDud/AquaLink)             | JavaScript   | Yes           | Yes                | v1, v2, v3             |                                                                                                                                                                                                                 |
-| [DisCatSharp](https://github.com/Aiko-IT-Systems/DisCatSharp)       | .NET         | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)        | .NET         | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Nomia](https://github.com/DHCPCD9/Nomia)                           | .NET         | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [CogLink](https://github.com/PerformanC/Coglink)                    | C            | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [Lavalink-rs](https://gitlab.com/vicky5124/lavalink-rs)             | Rust, Python | unknown       | No                 | v1 and v2              |                                                                                                                                                                                                                 |
-| [nyxx_lavalink](https://github.com/nyxx-discord/nyxx_lavalink)      | Dart         | unknown       | No                 | v1                     |                                                                                                                                                                                                                 |
+**How to get your token:** Follow the [NodeLink YouTube Token Guide](https://github.com/PerformanC/NodeLink/blob/main/USING.md) (TV client OAuth flow).
 
-> [!IMPORTANT]
-> Lack of explicit NodeLink support *usually* means that the client implements the Lavalink API inconsistently, not following its defined formats and fields. Using such clients may lead to unexpected behavior.
+Once you have it, find the `clients.settings` block:
 
-> [!NOTE]
-> Data was sourced from the [official Lavalink documentation](https://lavalink.dev/clients#client-libraries) and manually updated.
-> Compatibility information for NodeLink v3 is still being verified.
+```javascript
+clients: {
+  settings: {
+    TV: {
+      refreshToken: ['<yourtokenhere>']
+      // You can also use multiple tokens for rotation:
+      // refreshToken: ['token1', 'token2']
+    }
+  }
+}
+```
 
 ---
 
-### Memory Usage
+### 3. Spotify Credentials
 
-NodeLink is designed to be memory-efficient ⚡
+Required for Spotify track **search and metadata resolution**. Actual audio is streamed via YouTube/fallback sources.
 
-At startup, it typically uses around **50 MB**, stabilizing near **24 MB** when idle.
-Each active player adds between **4 and 15 MB**, depending on stream format and applied filters.
+**How to get credentials:**
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create a new application
+3. Copy the **Client ID** and **Client Secret**
 
-Cluster workers run independently, maintaining their own caches and pipelines — enabling parallel, scalable playback without session interference.
-
-### Monitoring Production
-
-NodeLink exposes **Prometheus metrics** at `/v4/metrics` for production monitoring:
-
-* Audio frame statistics (sent, nulled, deficit)
-* Memory breakdown (RSS, heap, external buffers)
-* Event loop lag and GC pauses
-* CPU load and active handles
-* API request tracking per endpoint
-* Source usage tracking
-
-**See the monitoring guide:** [nodelink.js.org/docs/advanced/prometheus](https://nodelink.js.org/docs/advanced/prometheus)
-
----
-
-### Architecture
-
-NodeLink follows a **worker-based model**, where each process manages its own players and buffers.
-Each worker acts as an autonomous mini-instance, communicating with the main process only when necessary.
-This reduces bottlenecks and keeps stability even under heavy load.
-
-Its modular structure also allows swapping components, adding new sources or filters, and adjusting internal behavior without touching the core server.
+```javascript
+spotify: {
+  enabled: true,
+  clientId: 'YOUR_SPOTIFY_CLIENT_ID',        // ← Replace
+  clientSecret: 'YOUR_SPOTIFY_CLIENT_SECRET', // ← Replace
+  externalAuthUrl: '',  // Optional external token provider URL
+  market: 'US',
+  allowExplicit: true,
+  // ... rest can stay as default
+}
+```
 
 ---
 
-### Dependencies
+## 🎧 Optional Sources
 
-Internally, NodeLink combines native and WebAssembly modules for precise audio processing, buffering, and packet handling.
+These sources work out-of-the-box without credentials. The ones listed below require extra setup for full functionality.
 
-- [`@performanc/pwsl-server`](https://github.com/PerformanC/internals/tree/PWSL-server) ⚡
-- [`@performanc/voice`](https://github.com/PerformanC/voice) ⚡
-- [`@alexanderolsen/libsamplerate-js`](https://www.npmjs.com/package/@alexanderolsen/libsamplerate-js)
-- [`@ecliptia/faad2-wasm`](https://www.npmjs.com/package/@ecliptia/faad2-wasm) 💙
-- [`@ecliptia/seekable-stream`](https://github.com/1Lucas1apk/seekable-stream) 💙
-- [`@toddynnn/symphonia-decoder`](https://www.npmjs.com/package/@toddynnn/symphonia-decoder)
-- [`mp4box`](https://www.npmjs.com/package/mp4box)
-- [`myzod`](https://www.npmjs.com/package/myzod)
-- [`toddy-mediaplex`](https://www.npmjs.com/package/toddy-mediaplex)
+### Apple Music
 
-**Optional Dependencies:**
+Auto-fetches a token by default. For manual token:
 
-- [`prom-client`](https://www.npmjs.com/package/prom-client) – Required only if Prometheus metrics are enabled in config. Install with `npm install prom-client`.
-
-> [!NOTE]
-> Dependencies marked with ⚡ are maintained by PerformanC.  
-> Dependencies marked with 💙 are maintained by Ecliptia.
-
-These modules form the essential foundation that keeps NodeLink’s playback stable and reliable.
+```javascript
+applemusic: {
+  enabled: true,
+  mediaApiToken: 'token_here', // Leave as 'token_here' for auto-fetch
+  market: 'US'
+}
+```
 
 ---
 
-## Contributing
+### Tidal
 
-Pull requests are welcome!
+Token auto-fetches via Google login. For manual token:
 
-Feel free to open issues, share suggestions, or join discussions on Discord.
-Every contribution helps make NodeLink more stable, accessible, and well-documented.
+```javascript
+tidal: {
+  enabled: true,
+  token: 'token_here', // Leave as 'token_here' for auto-fetch
+  countryCode: 'US'
+}
+```
 
-**Found a bug?** [Report it](https://github.com/PerformanC/NodeLink/issues) and we'll fix it.  
-**Need a feature?** Let us know and we'll consider it.  
-**Want to contribute?** The codebase is waiting for you.
-
-**Together, we make NodeLink better.** 💚
-
----
-
-## Special Thanks
-
-A huge thank you to **@RainyXeon** for generously allowing us to incorporate the NicoVideo streaming logic from [LunaStream](https://github.com/LunaStream/LunaStream). Your contribution made this possible and is greatly appreciated!
+For **HiFi/lossless streaming**, set up a [hifi-api](https://github.com/binimum/hifi-api/) instance and add it to `hifiApis`.
 
 ---
 
-## Community & Support
+### Deezer
 
-Questions, feedback, or contributions are always welcome:
+Works without credentials. For premium/lossless content, provide an ARL cookie:
 
-* [PerformanC Discord Server](https://discord.gg/uPveNfTuCJ)
-* [Ecliptia "Imagine" Server](https://discord.gg/fzjksWS65v)
-* [Official Documentation](https://nodelink.js.org)
-
----
-
-## License
-
-NodeLink is open-source software released under the **GNU General Public License v3.0**.
-See [LICENSE](LICENSE) for full details.
+```javascript
+deezer: {
+  enabled: true,
+  // arl: 'YOUR_DEEZER_ARL_COOKIE', // Uncomment and fill for premium
+  // decryptionKey: '',              // Required alongside ARL for lossless
+}
+```
 
 ---
 
-### Motivation
+### Qobuz
 
-NodeLink was born from a simple desire: to understand and master every detail of an audio server — without relying on closed, heavy, or complicated solutions.
-The goal is to make audio accessible, transparent, and fun to build.
+Works without credentials for low-quality streams. For 320kbps/FLAC:
 
----
-
-## Star History
-
-<a href="https://www.star-history.com/#PerformanC/NodeLink&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=PerformanC/NodeLink&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=PerformanC/NodeLink&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=PerformanC/NodeLink&type=date&legend=top-left" />
- </picture>
-</a>
+```javascript
+qobuz: {
+  enabled: true,
+  userToken: 'YOUR_QOBUZ_TOKEN', // Get from play.qobuz.com → DevTools → LocalStorage → localuser → token
+  formatId: '5'  // 5 = MP3 320kbps | 6 = FLAC | 27 = Hi-Res FLAC
+}
+```
 
 ---
 
-<p align="center">
-  <sub>NodeLink — where lightness meets sound. 🌿</sub><br>
-  <sub>Made with ⚡ and curiosity by PerformanC and Ecliptia 💙</sub><br>
-  <sub>(BRAZIL 🇧🇷)</sub>
-</p>
+### Yandex Music
+
+Requires an access token for playback (Yandex Music is region-restricted):
+
+```javascript
+yandexmusic: {
+  enabled: true,
+  accessToken: 'YOUR_YANDEX_TOKEN' // Get from Yandex Music API
+}
+```
 
 ---
 
+### VK Music
+
+Two authentication methods (choose one):
+
+```javascript
+vkmusic: {
+  enabled: true,
+  userToken: '',  // From browser DevTools → POST /?act=web_token → response → access_token
+  userCookie: '' // OR: same request → request headers → cookie (full header value)
+}
+```
+
+---
+
+### Bilibili
+
+Works without credentials. For premium/4K+ content:
+
+```javascript
+bilibili: {
+  enabled: true,
+  sessdata: 'YOUR_SESSDATA' // Get from bilibili.com → DevTools → Application → Cookies → SESSDATA
+}
+```
+
+---
+
+### Audius
+
+Free and open. For higher rate limits, register an app:
+
+```javascript
+audius: {
+  enabled: true,
+  appName: 'YourAppName',   // From https://audius.co/settings → Create App
+  apiKey: 'YOUR_API_KEY',
+  apiSecret: 'YOUR_API_SECRET'
+}
+```
+
+---
+
+### Last.fm
+
+Used for lyrics and metadata enrichment:
+
+```javascript
+lastfm: {
+  enabled: true,
+  apiKey: 'YOUR_LASTFM_API_KEY' // Get from https://www.last.fm/api/account/create
+}
+```
+
+---
+
+### SongLink / Odesli
+
+Cross-platform track resolution (finds the same song across streaming platforms):
+
+```javascript
+songlink: {
+  enabled: true,
+  apiKey: '', // Optional — get from https://odesli.co/
+  userCountry: 'US'
+}
+```
+
+---
+
+## ▶️ How to Run
+
+### Option A — Standard VPS / Linux
+
+```bash
+# Install dependencies
+npm install
+
+# Start NodeLink
+npm run start
+
+# (Recommended) Run 24/7 in background with PM2
+npm install -g pm2
+pm2 start npm --name "NodeLink" -- run start
+pm2 save
+pm2 startup  # Auto-start on server reboot
+```
+
+---
+
+### Option B — Pterodactyl / Web Panels
+
+Web panels often reject startup file paths longer than **16 characters**. The default NodeLink entry point (`dist/src/index.js`) is 18 characters and will fail.
+
+**Fix — create a `run.js` relay file:**
+
+1. Create a new file in your server's **root directory** named exactly `run.js`
+2. Paste this single line into it:
+
+```javascript
+import './dist/src/index.js';
+```
+
+3. Save the file.
+4. In your panel, go to **Startup** settings.
+5. Change the **Startup File** field from `dist/src/index.js` to:
+
+```
+run.js
+```
+
+6. Click **Start** from the Console tab. The panel will run `npm install` and launch automatically.
+
+> ✅ The panel's own `npm install` step will handle dependencies — no SSH needed.
+
+---
+
+## 🤖 Connecting Your Discord Bot
+
+Once your NodeLink console prints:
+
+```
+[STARTED] >: Server > Successfully listening on host 0.0.0.0, port XXXX
+```
+
+Configure your bot's music client (Riffy, Shoukaku, Poru, Erela.js, etc.):
+
+```javascript
+const nodes = [
+  {
+    name: 'MyNodeLink',
+    host: 'your.server.domain.com',  // Your VPS domain or panel hostname
+    port: 2333,                       // Must match config.js → server.port
+    password: 'your_password',        // Must match config.js → server.password
+    secure: false                     // Set to true ONLY if your host provides SSL on this port
+  }
+];
+```
+
+> ℹ️ **Panel users:** Your hostname is typically something like `node1.hidencloud.com`. Check your panel's connection info tab.
+
+---
+
+## ⚙️ Cluster & Performance Tuning
+
+This config ships with clustering enabled and sensible defaults for most VPS tiers. Key values to adjust based on your hardware:
+
+```javascript
+cluster: {
+  enabled: true,
+  workers: 0,           // 0 = auto (uses all CPU cores). Set to 1 for tiny VPS (512MB RAM)
+  minWorkers: 1,
+  specializedSourceWorker: {
+    enabled: true,
+    count: 1,           // Increase on multi-core servers
+    microWorkers: 2     // Threads per process cluster
+  },
+  hibernation: {
+    enabled: true,
+    timeoutMs: 1200000  // Workers sleep after 20 min of inactivity (saves RAM)
+  }
+}
+```
+
+**RAM guidance:**
+
+| RAM | Recommended `workers` setting |
+|---|---|
+| 512 MB | `1` |
+| 1 GB | `0` (auto, ~2 cores) |
+| 2 GB+ | `0` (auto) |
+
+---
+
+## 📝 License
+
+This configuration template is provided as-is for community use. NodeLink itself is licensed under its own terms — see the [official repository](https://github.com/PerformanC/NodeLink).
