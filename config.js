@@ -1,8 +1,8 @@
 export default {
   server: {
     host: '0.0.0.0',
-    port: 24656,
-    password: 'Iamprmgvyt2013@',
+    port: yourporthere,
+    password: 'yourpassword',
     useBunServer: false // set to true to use Bun.serve websocket (experimental)
   },
   cluster: {
@@ -370,7 +370,7 @@ export default {
         ], // Clients used for resolving detailed track information (channel, external links, etc.)
         settings: {
           TV: {
-            refreshToken: ['1//0evUPlSWFLGv4CgYIARAAGA4SNwF-L9Irz-IirfXUVvZi0dPkEivlTJa9K0sGDYQJBdUZCrF4Lx-HqKFUXGRSFGb8S3-nTMd3GJI'] // You can use a string "token" or an array ["token1", "token2"] for rotation/fallback
+            refreshToken: ['<yourtokenhere>'] // You can use a string "token" or an array ["token1", "token2"] for rotation/fallback
           }
         }
       },
