@@ -390,8 +390,8 @@ export default {
     },
     spotify: {
       enabled: true,
-      clientId: 'b9a4b5775f1847a2b072573589b530f7',
-      clientSecret: '682ef411fa5942d28bfe6c409e90f202',
+      clientId: 'clientidhere',
+      clientSecret: 'clientsecrethere',
       externalAuthUrl: 'http://get.1lucas1apk.fun/spotify/gettoken', // URL to external token provider (e.g. http://localhost:8080/api/token - use https://github.com/topi314/spotify-tokener or https://github.com/1Lucas1apk/gettoken)
       market: 'US',
       playlistLoadLimit: 1, // 0 means no limit (loads all tracks), 1 = 100 tracks, 2 = 100 and so on!
