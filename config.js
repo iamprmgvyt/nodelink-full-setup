@@ -1,8 +1,8 @@
 export default {
   server: {
     host: '0.0.0.0',
-    port: yourporthere,
-    password: 'yourpassword',
+    port: 10000,
+    password: 'Iamprmgvyt2013@',
     useBunServer: false // set to true to use Bun.serve websocket (experimental)
   },
   cluster: {
@@ -370,7 +370,7 @@ export default {
         ], // Clients used for resolving detailed track information (channel, external links, etc.)
         settings: {
           TV: {
-            refreshToken: ['<yourtokenhere>'] // You can use a string "token" or an array ["token1", "token2"] for rotation/fallback
+            refreshToken: ['1//0evUPlSWFLGv4CgYIARAAGA4SNwF-L9Irz-IirfXUVvZi0dPkEivlTJa9K0sGDYQJBdUZCrF4Lx-HqKFUXGRSFGb8S3-nTMd3GJI'] // You can use a string "token" or an array ["token1", "token2"] for rotation/fallback
           }
         }
       },
@@ -390,8 +390,8 @@ export default {
     },
     spotify: {
       enabled: true,
-      clientId: 'clientidhere',
-      clientSecret: 'clientsecrethere',
+      clientId: 'b9a4b5775f1847a2b072573589b530f7',
+      clientSecret: '682ef411fa5942d28bfe6c409e90f202',
       externalAuthUrl: 'http://get.1lucas1apk.fun/spotify/gettoken', // URL to external token provider (e.g. http://localhost:8080/api/token - use https://github.com/topi314/spotify-tokener or https://github.com/1Lucas1apk/gettoken)
       market: 'US',
       playlistLoadLimit: 1, // 0 means no limit (loads all tracks), 1 = 100 tracks, 2 = 100 and so on!
