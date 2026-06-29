@@ -1,8 +1,8 @@
 export default {
   server: {
     host: '0.0.0.0',
-    port: yourporthere,
-    password: 'yourpassword',
+    port: yourporthere, // if you deploy on Render,you can use port 10000
+    password: 'youshallnotpass',
     useBunServer: false // set to true to use Bun.serve websocket (experimental)
   },
   cluster: {
@@ -370,7 +370,7 @@ export default {
         ], // Clients used for resolving detailed track information (channel, external links, etc.)
         settings: {
           TV: {
-            refreshToken: ['<yourtokenhere>'] // You can use a string "token" or an array ["token1", "token2"] for rotation/fallback
+            refreshToken: [] // You can use a string "token" or an array ["token1", "token2"] for rotation/fallback
           }
         }
       },
@@ -390,9 +390,9 @@ export default {
     },
     spotify: {
       enabled: true,
-      clientId: 'clientidhere',
-      clientSecret: 'clientsecrethere',
-      externalAuthUrl: 'http://get.1lucas1apk.fun/spotify/gettoken', // URL to external token provider (e.g. http://localhost:8080/api/token - use https://github.com/topi314/spotify-tokener or https://github.com/1Lucas1apk/gettoken)
+      clientId: '',
+      clientSecret: '',
+      externalAuthUrl: 'https://get.1lucas1apk.fun/spotify/gettoken', // URL to external token provider (e.g. http://localhost:8080/api/token - use https://github.com/topi314/spotify-tokener or https://github.com/1Lucas1apk/gettoken)
       market: 'US',
       playlistLoadLimit: 1, // 0 means no limit (loads all tracks), 1 = 100 tracks, 2 = 100 and so on!
       playlistPageLoadConcurrency: 10, // How many pages to load simultaneously
